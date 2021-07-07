@@ -2,8 +2,6 @@
 
 #include <memory>
 #include <numeric>
-#include <random>
-#include <iostream>
 #include <vulkan/vulkan.h>
 #include "engine.h"
 

@@ -1,0 +1,29 @@
+#version 460
+#define LOCAL_SZ_X 64
+#define LOCAL_SZ_Y 16
+
+// without broadcasting lower_bound = total; upper_bound = 1
+// with broadcasting upper_bound = delta between w_count; lower_bound = w_total
+
+layout(push_constant) uniform pushBlock {
+    int upper_bound;
+    int lower_bound;    
+};
+
+layout(binding = 0) readonly buffer buf1 { float X[]; };
+
+layout(binding = 1) readonly buffer buf2 { float W[]; };
+
+layout(binding = 2) writeonly buffer buf3 { float Y[]; };
+
+layout(local_size_x = LOCAL_SZ_X, local_size_y = LOCAL_SZ_Y, local_size_z = 1) in;
+
+void main()
+{
+    for (int i = int(gl_GlobalInvocationID.x); i < lower_bound; i += int(gl_NumWorkGroups.x * gl_WorkGroupSize.x))
+    {
+        for(int j = int(gl_GlobalInvocationID.y); j < upper_bound; j += int(gl_NumWorkGroups.y * gl_WorkGroupSize.y)){
+            Y[j * lower_bound + i] = X[j * lower_bound + i] + W[i];        
+        }
+    }
+}

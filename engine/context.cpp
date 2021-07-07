@@ -136,7 +136,7 @@ context::context()
         vkEnumerateInstanceLayerProperties(&layerCount, layerProperties.data());
 
         bool foundLayer = false;
-        for (VkLayerProperties prop : layerProperties)
+        for (const VkLayerProperties& prop : layerProperties)
         {
             std::cout << prop.layerName << " ::: " << prop.description << std::endl;
             if (strcmp("VK_LAYER_KHRONOS_validation", prop.layerName) == 0)
@@ -158,7 +158,7 @@ context::context()
         vkEnumerateInstanceExtensionProperties(nullptr, &extensionCount, extensionProperties.data());
 
         bool foundExtension = false;
-        for (VkExtensionProperties prop : extensionProperties)
+        for (const VkExtensionProperties& prop : extensionProperties)
         {
             if (strcmp(VK_EXT_DEBUG_REPORT_EXTENSION_NAME, prop.extensionName) == 0)
             {

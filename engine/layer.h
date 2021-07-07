@@ -24,12 +24,12 @@ public:
     void createDescriptorSetLayout(int buffer_num);
     void createDescriptorSet(int buffer_num);
     void createShaderModule(const uint32_t* spv, size_t sz, const std::string& source = std::string());
+    void createShaderModule();
     void createPipeline(uint32_t push_constants_size = 0, VkSpecializationInfo* specialization_info = nullptr);
     void createCommandBuffer();
     void recordCommandBuffer(void* push_constants = nullptr, uint32_t push_constants_size = 0);
     int runCommandBuffer();
     void bindtensor(tensor& t, uint32_t binding);
-    void run();
 
 protected:
     VkDevice m_device;
@@ -44,10 +44,10 @@ protected:
     int m_group_x;
     int m_group_y;
     int m_group_z;
-
     int m_device_id;
 
     std::string m_type;
     std::future<void> m_future;
     std::vector<std::future<void>> m_futures;
+    std::vector<uint32_t> _shader;
 };

@@ -22,7 +22,6 @@ extern std::mutex kDesciptorMtx;
 extern size_t number_devices();
 extern size_t avalible_memory(int device_id);
 
-
 #define VK_CHECK_RESULT(f) \
 { \
 		if (f != VK_SUCCESS) \
@@ -30,3 +29,4 @@ extern size_t avalible_memory(int device_id);
 			std::cout << "VULKAN KERNEL ERROR: " << f; \
 		} \
 }
+

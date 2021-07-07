@@ -1,5 +1,4 @@
 #pragma once
-
 #include <vector>
 enum class Format
 {
@@ -13,7 +12,7 @@ enum class Format
     kFormatInt64 = 6,
     kFormatUInt8 = 7,
     kFormatBool = 8,
-    kFormatNum = -1
+    kFormatNone = -1
 };
 
 typedef std::vector<int> Shape;
@@ -24,4 +23,3 @@ size_t avalible_memory(int device_id);
 #include "tensor.h"
 #include "buffer.h"
 #include "layer.h"
-#include "render.h"

@@ -35,7 +35,6 @@ layer::~layer()
         vkDestroyPipeline(m_device, m_pipeline, nullptr);
     if (m_pipeline_layout != nullptr)
         vkDestroyPipelineLayout(m_device, m_pipeline_layout, nullptr);
-
     ///if (m_device != nullptr && kDevices.size() == 0)
     //    vkDestroyDevice(m_device, nullptr);
 }
@@ -106,6 +105,10 @@ void layer::createShaderModule(const uint32_t* spv, size_t size, const std::stri
 #endif
     }
     VK_CHECK_RESULT(vkCreateShaderModule(m_device, &create_info, nullptr, &m_shader_module));
+}
+
+void layer::createShaderModule() {
+    createShaderModule(_shader.data(), _shader.size());
 }
 
 void layer::createPipeline(uint32_t push_constants_size, VkSpecializationInfo* specialization_info)
