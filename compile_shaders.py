@@ -24,8 +24,8 @@ elif sys.platform.find('linux') != -1:
     dir = os.path.join('/'.join(__file__.split('/')[:-1]), 'shaders')
     print(dir)
 
-headfile = open('./vknn/spv_shader.h', 'w+')
-cpp_file = open('./vknn/spv_shader.cpp', 'w+')
+headfile = open('./include/cookbook/spv_shader.h', 'w+')
+cpp_file = open('./src/cookbook/spv_shader.cpp', 'w+')
 
 print()
 
