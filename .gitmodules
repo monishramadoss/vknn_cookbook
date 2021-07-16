@@ -1,0 +1,16 @@
+[submodule "external/Vulkan-Headers"]
+	path = external/Vulkan-Headers
+	url = https://github.com/KhronosGroup/Vulkan-Headers
+	branch = v1.2.170
+[submodule "external/googletest"]
+	path = external/googletest
+	url = https://github.com/google/googletest
+	branch = release-1.11.0
+[submodule "python/pybind11"]
+	path = external/pybind11
+	url = https://github.com/pybind/pybind11
+    branch = v2.6.2
+[submodule "onnx/onnx"]
+	path = external/onnx
+	url = https://github.com/onnx/onnx
+	branch = v1.9.0
