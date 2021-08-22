@@ -1,5 +1,5 @@
 from madml import zeros
-from madml.nn import Module, graph_mgr
+from . import Module, graph_mgr
 
 
 class relu(Module):

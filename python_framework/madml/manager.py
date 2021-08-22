@@ -35,6 +35,7 @@ class Manager(object):
     def set_output(self, module, name, tensor):
         if name not in self.operations_dict[module.name]['outputs']:
             self.operations_dict[module.name]['outputs'][name] = tensor
+        tensor.layer = module.name
         return tensor
 
     def get_input(self, module, name):
@@ -50,7 +51,8 @@ class Manager(object):
     def get_mod(self, name):
         return self.operations_dict[name]['module']
 
-    def backward(self):
-        pass
+    def backward(self, node):
+        print(id(node), node)
+
 
 graph_mgr = Manager()

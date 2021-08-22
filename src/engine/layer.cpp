@@ -35,8 +35,8 @@ layer::~layer()
         vkDestroyPipeline(m_device, m_pipeline, nullptr);
     if (m_pipeline_layout != nullptr)
         vkDestroyPipelineLayout(m_device, m_pipeline_layout, nullptr);
-    ///if (m_device != nullptr && kDevices.size() == 0)
-    //    vkDestroyDevice(m_device, nullptr);
+    if (m_device != nullptr && kDevices.size() == 0)
+        vkDestroyDevice(m_device, nullptr);
 }
 
 void layer::initVulkanThing(int buffer_num)
@@ -206,8 +206,8 @@ int layer::runCommandBuffer()
     VkFenceCreateInfo fence_create_info_ = {};
     fence_create_info_.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
     fence_create_info_.flags = 0;
-
-    m_future.wait();
+    if (m_future.valid())
+        m_future.wait();
     VK_CHECK_RESULT(vkCreateFence(m_device, &fence_create_info_, nullptr, &fence));
 
     {

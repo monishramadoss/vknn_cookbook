@@ -9,7 +9,7 @@
 [submodule "python/pybind11"]
 	path = external/pybind11
 	url = https://github.com/pybind/pybind11
-    branch = v2.6.2
+	branch = v2.6.2
 [submodule "onnx/onnx"]
 	path = external/onnx
 	url = https://github.com/onnx/onnx

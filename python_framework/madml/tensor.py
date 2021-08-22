@@ -9,11 +9,12 @@ class tensor(object):
         if shape is None:
             shape = []
         self.data = data
-        self.input_layer_name = None
+        self.input_layer_name = ''
         self.shape = shape
+        self.layer = ''
 
     def __str__(self):
-        return self.input_layer_name + ' ' + str(self.shape)
+        return self.input_layer_name + ' ' + str(self.shape) + ' ' + 'layer_name: ' + self.layer
 
     def __add__(self, other):
         mod = graph_mgr.register('add', self.input_layer_name, inputs={'x': self, 'w': other})
@@ -33,6 +34,10 @@ class tensor(object):
 
     def flatten(self):
         mod = graph_mgr.register('flatten', self.input_layer_name, inputs={'x': self})
+        return mod.get_output()
+
+    def T(self):
+        mod = graph_mgr.register('transpose', self.input_layer_name, params={'axis': [1, 0]}, inputs={'x': self})
         return mod.get_output()
 
     def __matmul__(self, other):
@@ -92,7 +97,7 @@ class tensor(object):
         return mod.get_output()
 
     def backward(self):
-        graph_mgr.backward()
+        graph_mgr.backward(self)
 
     def size(self, idx=0):
         return reduce(lambda x, y: x * y, self.shape[idx:])

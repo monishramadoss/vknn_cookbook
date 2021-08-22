@@ -18,6 +18,8 @@ tensor::tensor(char* data, const std::vector<int>& shape, Format fmt) : m_format
     createContext();
     m_device = kDevices[m_device_id];
     reshape(data, shape);
+    //delete[] data;
+
 }
 
 tensor::tensor(std::vector<float>& c, const std::vector<int>& shape) : m_format(Format::kFormatFp32), m_size_in_byte(0)

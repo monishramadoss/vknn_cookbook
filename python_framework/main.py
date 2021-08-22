@@ -29,5 +29,9 @@ class cnn_mnist_model(Module):
 
 x = madml.zeros([76, 76])
 model = cnn_mnist_model()
-model(x)
+y = model(x)
 print(model)
+
+y.backward()
+
+print(y)

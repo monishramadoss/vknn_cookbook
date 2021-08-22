@@ -275,8 +275,8 @@ context::~context()
 
     if (enableValidationLayers)
     {
-        const auto func = reinterpret_cast<PFN_vkDestroyDebugReportCallbackEXT>(vkGetInstanceProcAddr(
-            kInstance, "vkDestroyDebugReportCallbackEXT"));
+        const auto func = reinterpret_cast<PFN_vkDestroyDebugReportCallbackEXT>(
+            vkGetInstanceProcAddr(kInstance, "vkDestroyDebugReportCallbackEXT"));
         if (func == nullptr)
         {
             printf("Could not load vkDestroyDebugReportCallbackEXT");

@@ -1,9 +1,5 @@
 // cookbook.cpp : Defines the functions for the static library.
 //
 
-#include "cookbook.h"
+#include "cookbook.hpp"
 
-// TODO: This is an example of a library function
-void fncookbook()
-{
-}

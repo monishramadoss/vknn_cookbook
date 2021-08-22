@@ -5,8 +5,9 @@
 #include <engine.h>
 #include <layer.h>
 #include <tensor.h>
+#include <utils.h>
 
-#include "spv_shader.h"
+#include "spv_shader.hpp"
 
 struct activation_param {
     int total;
@@ -14,48 +15,53 @@ struct activation_param {
 
 template<typename param>
 class activation : public layer {
-    param m_param = { 0 };
-    tensor act_field ;
+    param m_param = {};
+    tensor act_field;
+    tensor y;
+    bool init;
 public:
-    activation(const uint32_t* shaderCode){
+    activation(const uint32_t* shaderCode, const size_t codeSize) : init(false){
         initVulkanThing(3);
-        _shader = shaderCode;
+        _shader = shaderCode;   
+        _shader_size = codeSize;
     }
 
-    tensor& forward(tensor& x, tensor& y = nullptr, tensor& activation_field = nullptr) {
+    tensor& forward(tensor& x) {
+        if (!init) {
+            std::vector<int> tmp_data = std::vector<int>(x.count(), 0);
+            act_field = tensor((char*)&tmp_data[0], x.getShape(), Format::kFormatBool);
+            init = true;
+            y = tensor(0.0, x.getShape());
+        }   
+               
+        forward(x, y, act_field);
+        return y;
+    }
+
+    tensor& forward(tensor& x, tensor& y, tensor& activation_field) {
         if (m_pipeline == nullptr) {
             m_param.total = x.count();
             m_group_x = static_cast<int>(alignSize(m_param.total, local_sz)) / local_sz;
             if (m_group_x > max_compute_work_group_count)
                 m_group_x = max_compute_work_group_count - 1;
-            createShaderModule(_shader, sizeof(_shader));
+            createShaderModule(_shader, _shader_size);
             createPipeline(sizeof(param));
         }
 
-        if (activation_field == nullptr && act_field == nullptr) {
-            std::vector<bool> tmp_data;
-            tmp_data.resize(x.count());
-            std::fill_n<bool>(tmp_data, x.count(), 0);
-            act_field = tensor(static_cast<char*>(tmp_data.data), x.getShape(), Format::kFormatBool);
-            activation_field = act_field;
-        }
-        else if (activation_field != nullptr) {
-            act_field = activation_field;
-        }
-
-        if (y == nullptr)
-            y = tensor(0, x.getShape());
-
         bindtensor(x, 0);
-        bindtensor(act_field, 1);
+        bindtensor(activation_field, 1);
         bindtensor(y, 2);
         recordCommandBuffer(static_cast<void*>(&m_param), sizeof(param));
-        return y
+        return y;
+    }
+
+    activation(const activation<param>& A) {
+        *this = A;
     }
 };
 
 
 class relu : public activation<activation_param> {
 public:
-    relu() : activation<activation_param>(relu_spv){}
+    relu() : activation<activation_param>(relu_spv, sizeof(relu_spv)) {}
 };

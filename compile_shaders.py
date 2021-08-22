@@ -24,8 +24,8 @@ elif sys.platform.find('linux') != -1:
     dir = os.path.join('/'.join(__file__.split('/')[:-1]), 'shaders')
     print(dir)
 
-headfile = open('./include/cookbook/spv_shader.h', 'w+')
-cpp_file = open('./src/cookbook/spv_shader.cpp', 'w+')
+headfile = open('./include/spv_shader.hpp', 'w+')
+cpp_file = open('./src/spv_shader.cpp', 'w+')
 
 print()
 
@@ -91,7 +91,7 @@ with gzip.GzipFile('compile.json.gz', 'w') as fout:
     fout.write(json.dumps(bin_dict).encode('utf-8'))
 
 headfile.writelines(outfile_str + ["\n"])
-cpp_file.writelines(['#include<cstdlib>\n#include "spv_shader.h"\n'] + bin_code)
+cpp_file.writelines(['#include<cstdlib>\n#include "spv_shader.hpp"\n'] + bin_code)
 
 for root, dirs, files in os.walk(dir):
     for currentFile in files:

@@ -49,4 +49,5 @@ protected:
     std::future<void> m_future;
     std::vector<std::future<void>> m_futures;
     const uint32_t* _shader;
+    size_t _shader_size;
 };

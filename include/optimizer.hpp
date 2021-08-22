@@ -11,7 +11,7 @@ class adam : public layer {
 
 };
 
-class sgd : public layer {
+class stocasticGradient : public layer {
 
 };
 

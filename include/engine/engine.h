@@ -1,5 +1,6 @@
 #pragma once
 #include <vector>
+
 enum class Format
 {
     kFormatInvalid = -1,
