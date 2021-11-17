@@ -18,7 +18,8 @@ std::vector<VkDevice> kDevices;
 std::vector<VkQueue> kQueues;
 std::vector<VkCommandPool> kCmdPools;
 std::vector<VkPhysicalDeviceProperties> kLimits;
-
+std::vector<VkPhysicalDeviceMemoryProperties> kMemLimits;
+size_t number_of_devices = 0;
 VkDebugReportCallbackEXT kDebugReportCallback;
 uint32_t kQueueFamilyIndex;
 std::vector<const char*> kEnabledLayers;
@@ -110,18 +111,17 @@ bool isAvailable()
 
 size_t number_devices()
 {
-    if (kCtx)
-        return kPhysicalDevices.size();
-    else
-        return 0;
+    createContext();
+    return kCtx ? kDevices.size() : 0;
+   
 }
 
 size_t avalible_memory(int device_id)
 {
-    if (kCtx && device_id != -1 && device_id < kLimits.size())
-        return kLimits[device_id].limits.maxStorageBufferRange;
-    else
-        return 0;
+    createContext();
+    return kLimits[device_id].limits.maxMemoryAllocationCount;
+    return kLimits[device_id].limits.maxComputeSharedMemorySize;
+    return  kCtx && device_id != -1 && device_id < kLimits.size() ? kLimits[device_id].limits.maxStorageBufferRange : 0;
 }
 
 context::context()
@@ -260,6 +260,7 @@ context::context()
         kCmdPools.push_back(CmdPool);
         kLimits.push_back(device_properties);
     }
+    number_of_devices = kPhysicalDevices.size();
 }
 
 context::~context()

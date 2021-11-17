@@ -2,10 +2,10 @@
 
 extern const unsigned int leakyrelu_spv[598];
 extern const unsigned int prelu_spv[703];
-extern const unsigned int relu_spv[549];
+extern const unsigned int relu_spv[535];
 extern const unsigned int selu_spv[661];
 extern const unsigned int sigmoid_spv[472];
-extern const unsigned int add_spv[630];
+extern const unsigned int add_spv[458];
 extern const unsigned int gemm_spv[1171];
 extern const unsigned int wt_gemm_spv[1184];
 extern const unsigned int xt_gemm_spv[1184];

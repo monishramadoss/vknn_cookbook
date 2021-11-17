@@ -7,34 +7,52 @@ typedef int shaderc_shader_kind;
 #define SHADERC_COMPUTE_SHADER 0
 #endif
 #include <string>
-
+#include <fstream>
+#include <iostream>
 #include "engine.h"
 #include "context.h"
 
 inline size_t alignSize(size_t sz, int n) { return (sz + n - 1) & -n; }
 
-inline std::vector<uint32_t> compile(const std::string& name, const std::string& data)
+
+template<typename ... Args>
+std::string string_format(const std::string& format, Args ... args)
 {
-    std::vector<uint32_t> result;
-#ifdef USE_SHADERC
-
-    shaderc::Compiler compiler;
-    shaderc::CompileOptions options;
-
-    options.SetGenerateDebugInfo();
-    options.SetTargetEnvironment(shaderc_target_env_vulkan, shaderc_env_version_vulkan_1_2);
-    shaderc::SpvCompilationResult module = compiler.CompileGlslToSpv(data.c_str(), data.size(), shaderc_glsl_compute_shader, name.c_str(), options);
-
-    if (module.GetCompilationStatus() != shaderc_compilation_status_success)
-    {
-        std::cerr << module.GetErrorMessage();
-    }
-    result.assign(module.cbegin(), module.cend());
-    return result;
-#else
-    return result;
-#endif
+    int size_s = std::snprintf(nullptr, 0, format.c_str(), args ...) + 1; // Extra space for '\0'
+    if (size_s <= 0) { throw std::runtime_error("Error during formatting."); }
+    auto size = static_cast<size_t>(size_s);
+    auto buf = std::make_unique<char[]>(size);
+    std::snprintf(buf.get(), size, format.c_str(), args ...);
+    return std::string(buf.get(), buf.get() + size - 1); // We don't want the '\0' inside
 }
+
+
+static std::vector<uint32_t> compile(const std::string& source, char* filename=nullptr)
+{
+    std::string tmp_filename_in = tmpnam(nullptr);
+    std::string tmp_filename_out = tmpnam(nullptr);
+    FILE* tmp_file = nullptr;
+    tmp_file = fopen(tmp_filename_in.c_str(), "wb+");
+    fputs(source.c_str(), tmp_file);
+    fclose(tmp_file);
+
+    tmp_file = fopen(tmp_filename_out.c_str(), "wb+");
+    fclose(tmp_file);
+
+
+    std::string cmd_str = std::string("glslangValidator -V " + tmp_filename_in + " -S comp -o " + tmp_filename_out);
+    
+    
+    std::cout << cmd_str << std::endl;
+    auto system_return = system(cmd_str.c_str());
+    if (system_return)
+        throw std::runtime_error("Error running glslangValidator command");
+    std::ifstream fileStream(tmp_filename_out, std::ios::binary);
+    std::vector<char> buffer;
+    buffer.insert(buffer.begin(), std::istreambuf_iterator<char>(fileStream), {});
+    return { (uint32_t*)buffer.data(), (uint32_t*)(buffer.data() + buffer.size()) };
+}
+
 
 inline bool checkFormat(Format fmt) { return fmt > Format::kFormatInvalid && fmt < Format::kFormatNone; }
 
@@ -67,21 +85,6 @@ inline size_t elementSize(Format fmt)
     return 0;
 }
 
-inline int shapeCount(const Shape& shape, int start = -1, int end = -1)
-{
-    if (start == -1) start = 0;
-    if (end == -1) end = static_cast<int>(shape.size());
-    if (shape.empty()) return 0;
-    int elems = 1;
-
-    for (int i = start; i < end; i++)
-    {
-        if (elems * shape[i] <= INT32_MAX)
-            elems *= shape[i];
-    }
-
-    return elems;
-}
 
 inline bool is_arithmetic(Format fmt) {
     return !(fmt == Format::kFormatBool || fmt == Format(-1));

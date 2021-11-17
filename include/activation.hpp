@@ -28,8 +28,8 @@ public:
 
     tensor& forward(tensor& x) {
         if (!init) {
-            std::vector<int> tmp_data = std::vector<int>(x.count(), 0);
-            act_field = tensor((char*)&tmp_data[0], x.getShape(), Format::kFormatBool);
+            std::vector<int> tmp_data(x.count());
+            act_field = tensor((char*)&tmp_data[0], x.getShape(), Format::kFormatInt32);
             init = true;
             y = tensor(0.0, x.getShape());
         }   
@@ -52,6 +52,7 @@ public:
         bindtensor(activation_field, 1);
         bindtensor(y, 2);
         recordCommandBuffer(static_cast<void*>(&m_param), sizeof(param));
+        runCommandBuffer();
         return y;
     }
 
@@ -59,6 +60,7 @@ public:
         *this = A;
     }
 };
+
 
 
 class relu : public activation<activation_param> {

@@ -31,7 +31,6 @@ public:
     void bindtensor(tensor& t, uint32_t binding);
 
 protected:
-    VkDevice m_device;
     VkPipeline m_pipeline;
     VkCommandBuffer m_cmd_buffer;
     VkDescriptorPool m_descriptor_pool;

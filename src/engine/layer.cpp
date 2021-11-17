@@ -9,7 +9,6 @@ layer::layer()
     createContext();
     m_device_id = 0;
 
-    m_device = kDevices[m_device_id];
     m_pipeline = nullptr;
     m_cmd_buffer = nullptr;
     m_descriptor_pool = nullptr;
@@ -26,17 +25,18 @@ layer::layer()
 layer::~layer()
 {
     if (m_shader_module != nullptr)
-        vkDestroyShaderModule(m_device, m_shader_module, nullptr);
+        vkDestroyShaderModule(kDevices[m_device_id], m_shader_module, nullptr);
     if (m_descriptor_pool != nullptr)
-        vkDestroyDescriptorPool(m_device, m_descriptor_pool, nullptr);
+        vkDestroyDescriptorPool(kDevices[m_device_id], m_descriptor_pool, nullptr);
     if (m_descriptor_set_layout != nullptr)
-        vkDestroyDescriptorSetLayout(m_device, m_descriptor_set_layout, nullptr);
+        vkDestroyDescriptorSetLayout(kDevices[m_device_id], m_descriptor_set_layout, nullptr);
     if (m_pipeline != nullptr)
-        vkDestroyPipeline(m_device, m_pipeline, nullptr);
+        vkDestroyPipeline(kDevices[m_device_id], m_pipeline, nullptr);
     if (m_pipeline_layout != nullptr)
-        vkDestroyPipelineLayout(m_device, m_pipeline_layout, nullptr);
-    if (m_device != nullptr && kDevices.size() == 0)
-        vkDestroyDevice(m_device, nullptr);
+        vkDestroyPipelineLayout(kDevices[m_device_id], m_pipeline_layout, nullptr);
+
+    //if (kDevices[m_device_id] != nullptr && kDevices.size() == 0)      
+    //    vkDestroyDevice(kDevices[m_device_id], nullptr);
 }
 
 void layer::initVulkanThing(int buffer_num)
@@ -62,7 +62,7 @@ void layer::createDescriptorSetLayout(int buffer_num)
     info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
     info.bindingCount = buffer_num;
     info.pBindings = &bindings[0];
-    VK_CHECK_RESULT(vkCreateDescriptorSetLayout(m_device, &info, nullptr, &m_descriptor_set_layout));
+    VK_CHECK_RESULT(vkCreateDescriptorSetLayout(kDevices[m_device_id], &info, nullptr, &m_descriptor_set_layout));
 }
 
 void layer::createDescriptorSet(int buffer_num)
@@ -76,14 +76,14 @@ void layer::createDescriptorSet(int buffer_num)
     info.maxSets = 1;
     info.poolSizeCount = 1;
     info.pPoolSizes = &pool_size;
-    VK_CHECK_RESULT(vkCreateDescriptorPool(m_device, &info, nullptr, &m_descriptor_pool));
+    VK_CHECK_RESULT(vkCreateDescriptorPool(kDevices[m_device_id], &info, nullptr, &m_descriptor_pool));
 
     VkDescriptorSetAllocateInfo allocate_info = {};
     allocate_info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
     allocate_info.descriptorPool = m_descriptor_pool;
     allocate_info.descriptorSetCount = 1;
     allocate_info.pSetLayouts = &m_descriptor_set_layout;
-    VK_CHECK_RESULT(vkAllocateDescriptorSets(m_device, &allocate_info, &m_descriptor_set));
+    VK_CHECK_RESULT(vkAllocateDescriptorSets(kDevices[m_device_id], &allocate_info, &m_descriptor_set));
 }
 
 void layer::createShaderModule(const uint32_t* spv, size_t size, const std::string& source)
@@ -97,14 +97,11 @@ void layer::createShaderModule(const uint32_t* spv, size_t size, const std::stri
     }
     else
     {
-#ifdef USE_SHADERC
-        std::vector<uint32_t> code;
-        code = compile("shader", source);
+        std::vector<uint32_t> code = compile(source);
         create_info.pCode = code.data();
         create_info.codeSize = sizeof(uint32_t) * code.size();
-#endif
     }
-    VK_CHECK_RESULT(vkCreateShaderModule(m_device, &create_info, nullptr, &m_shader_module));
+    VK_CHECK_RESULT(vkCreateShaderModule(kDevices[m_device_id], &create_info, nullptr, &m_shader_module));
 }
 
 void layer::createShaderModule() {
@@ -136,13 +133,13 @@ void layer::createPipeline(uint32_t push_constants_size, VkSpecializationInfo* s
 
     pipeline_layout_create_info.setLayoutCount = 1;
     pipeline_layout_create_info.pSetLayouts = &m_descriptor_set_layout;
-    VK_CHECK_RESULT(vkCreatePipelineLayout(m_device, &pipeline_layout_create_info, nullptr, &m_pipeline_layout));
+    VK_CHECK_RESULT(vkCreatePipelineLayout(kDevices[m_device_id], &pipeline_layout_create_info, nullptr, &m_pipeline_layout));
 
     VkComputePipelineCreateInfo pipeline_create_info = {};
     pipeline_create_info.sType = VK_STRUCTURE_TYPE_COMPUTE_PIPELINE_CREATE_INFO;
     pipeline_create_info.stage = stage_create_info;
     pipeline_create_info.layout = m_pipeline_layout;
-    VK_CHECK_RESULT(vkCreateComputePipelines(m_device, VK_NULL_HANDLE, 1, &pipeline_create_info, nullptr, &m_pipeline));
+    VK_CHECK_RESULT(vkCreateComputePipelines(kDevices[m_device_id], VK_NULL_HANDLE, 1, &pipeline_create_info, nullptr, &m_pipeline));
 }
 
 void layer::createCommandBuffer()
@@ -153,7 +150,7 @@ void layer::createCommandBuffer()
     info.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
     info.commandBufferCount = 1;
     kContextMtx.lock();
-    VK_CHECK_RESULT(vkAllocateCommandBuffers(m_device, &info, &m_cmd_buffer));
+    VK_CHECK_RESULT(vkAllocateCommandBuffers(kDevices[m_device_id], &info, &m_cmd_buffer));
     kContextMtx.unlock();
 }
 
@@ -191,7 +188,7 @@ void layer::bindtensor(tensor& t, uint32_t binding)
     write_descriptor_set.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
     write_descriptor_set.pBufferInfo = &desc_buffer_info;
     kContextMtx.lock();
-    vkUpdateDescriptorSets(m_device, 1, &write_descriptor_set, 0, nullptr);
+    vkUpdateDescriptorSets(kDevices[m_device_id], 1, &write_descriptor_set, 0, nullptr);
     kContextMtx.unlock();
 }
 
@@ -208,7 +205,7 @@ int layer::runCommandBuffer()
     fence_create_info_.flags = 0;
     if (m_future.valid())
         m_future.wait();
-    VK_CHECK_RESULT(vkCreateFence(m_device, &fence_create_info_, nullptr, &fence));
+    VK_CHECK_RESULT(vkCreateFence(kDevices[m_device_id], &fence_create_info_, nullptr, &fence));
 
     {
         kContextMtx.lock();
@@ -216,7 +213,7 @@ int layer::runCommandBuffer()
         kContextMtx.unlock();
     }
 
-    VK_CHECK_RESULT(vkWaitForFences(m_device, 1, &fence, VK_TRUE, 100000000000));
-    vkDestroyFence(m_device, fence, nullptr);
+    VK_CHECK_RESULT(vkWaitForFences(kDevices[m_device_id], 1, &fence, VK_TRUE, 100000000000));
+    vkDestroyFence(kDevices[m_device_id], fence, nullptr);
     return 1;
 }

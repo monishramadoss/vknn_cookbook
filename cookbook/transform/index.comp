@@ -1,0 +1,28 @@
+#version 460
+
+
+layout(push_constant) uniform pushBlock {
+    int upper;
+    int lower;
+    int size;
+}
+
+layout(binding = 0) buffer buf1 { float A[]; };
+
+layout(binding = 1) buffer buf2 { float B[]; };
+
+layout (local_size_x = 16, local_size_y = 64, local_size_z = 1) in;
+
+
+void main(){
+    uint x = gl_GlobalInvocationID.x;
+    uint y = gl_GlobalInvocationID.y;
+//    uint z = gl_GlobalInvocationID.z;
+    for (uint x = gl_GlobalInvocationID.x; x < upper; x += gl_NumWorkGroups.x * gl_WorkGroupSize.x)
+    {
+        uint idx = x;
+        for(uint y = gl_GlobalInvocationID.y; y < lower; y += gl_NumWorkGroups.y * gl_WorkGroupSize.y){
+            B[y] = A[idx];
+        }
+    }
+}
