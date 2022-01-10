@@ -1,4 +1,6 @@
 find_package(Vulkan REQUIRED)
+
+
 include_directories("${vulkan_ai_cookbook_SOURCE_DIR}/include")
 set(cookbook_include "${vulkan_ai_cookbook_SOURCE_DIR}/include")
 

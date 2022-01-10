@@ -120,6 +120,7 @@ size_t avalible_memory(int device_id)
 {
     createContext();
     return kLimits[device_id].limits.maxMemoryAllocationCount;
+    
     return kLimits[device_id].limits.maxComputeSharedMemorySize;
     return  kCtx && device_id != -1 && device_id < kLimits.size() ? kLimits[device_id].limits.maxStorageBufferRange : 0;
 }

@@ -34,9 +34,8 @@ layer::~layer()
         vkDestroyPipeline(kDevices[m_device_id], m_pipeline, nullptr);
     if (m_pipeline_layout != nullptr)
         vkDestroyPipelineLayout(kDevices[m_device_id], m_pipeline_layout, nullptr);
-
-    //if (kDevices[m_device_id] != nullptr && kDevices.size() == 0)      
-    //    vkDestroyDevice(kDevices[m_device_id], nullptr);
+    if (kDevices[m_device_id] != nullptr && kDevices.size() == 0)      
+        vkDestroyDevice(kDevices[m_device_id], nullptr);
 }
 
 void layer::initVulkanThing(int buffer_num)
@@ -216,4 +215,12 @@ int layer::runCommandBuffer()
     VK_CHECK_RESULT(vkWaitForFences(kDevices[m_device_id], 1, &fence, VK_TRUE, 100000000000));
     vkDestroyFence(kDevices[m_device_id], fence, nullptr);
     return 1;
+}
+
+tensor& layer::forward(tensor& t1) {
+    return t1;
+}
+
+tensor& layer::forward(tensor& t1, tensor& t2) {
+    return t1;
 }

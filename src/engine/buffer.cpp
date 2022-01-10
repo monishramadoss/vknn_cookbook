@@ -21,8 +21,6 @@ bool buffer::init(size_t size_in_bytes, const char* data)
     bufferCreateInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
     VK_CHECK_RESULT(vkCreateBuffer(kDevices[m_device_id], &bufferCreateInfo, nullptr, &m_buffer));
 
-    
-
     VkMemoryRequirements memoryRequirements;
     vkGetBufferMemoryRequirements(kDevices[m_device_id], m_buffer, &memoryRequirements);
     VkMemoryAllocateInfo allocateInfo = {};
@@ -36,7 +34,7 @@ bool buffer::init(size_t size_in_bytes, const char* data)
     if (data)
     {
         char* dst = nullptr;
-        VK_CHECK_RESULT(vkMapMemory(kDevices[m_device_id], m_memory, 0, 1024, 0, (void**)&dst));
+        VK_CHECK_RESULT(vkMapMemory(kDevices[m_device_id], m_memory, 0, size_in_bytes, 0, (void**)&dst));
         memcpy(dst, data, size_in_bytes);
         vkUnmapMemory(kDevices[m_device_id], m_memory);
     }

@@ -46,7 +46,7 @@ public:
 
     tensor& forward(tensor& x, tensor& w) {
         if (!init) {
-            y = tensor(0.0, x.getShape());
+            y = tensor(0.0f, x.getShape());
             init = true;
         }
         y = forward(x, w, y);

@@ -29,6 +29,8 @@ public:
     void recordCommandBuffer(void* push_constants = nullptr, uint32_t push_constants_size = 0);
     int runCommandBuffer();
     void bindtensor(tensor& t, uint32_t binding);
+    virtual tensor& forward(tensor& t);
+    virtual tensor& forward(tensor& t1, tensor& t2);
 
 protected:
     VkPipeline m_pipeline;

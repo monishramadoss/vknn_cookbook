@@ -29,9 +29,9 @@ public:
     tensor& forward(tensor& x) {
         if (!init) {
             std::vector<int> tmp_data(x.count());
-            act_field = tensor((char*)&tmp_data[0], x.getShape(), Format::kFormatInt32);
+            act_field = tensor(0, x.getShape());
             init = true;
-            y = tensor(0.0, x.getShape());
+            y = tensor(0.0f, x.getShape());
         }   
                
         forward(x, y, act_field);
@@ -52,7 +52,6 @@ public:
         bindtensor(activation_field, 1);
         bindtensor(y, 2);
         recordCommandBuffer(static_cast<void*>(&m_param), sizeof(param));
-        runCommandBuffer();
         return y;
     }
 
