@@ -118,6 +118,12 @@ void tensor::upload(std::unique_ptr<char>& ptr) {
     memcpy(dst, ptr.get(), m_size_in_bytes);
 }
 
+char* tensor::offcopy(uint32_t offset) const {
+    void* src = map(m_device_id, m_buffer->getVkMemory(), m_size_in_bytes, offset);
+    memcpy(host_data.get() + offset, src, m_size_in_bytes - offset);
+    return host_data.get();
+}
+
 char* tensor::download(uint32_t offset) const
 {
     void* src = map(m_device_id, m_buffer->getVkMemory(), m_size_in_bytes, offset);
@@ -125,18 +131,18 @@ char* tensor::download(uint32_t offset) const
     return host_data.get();
 }
 
-tensor& tensor::slice(int split_size, int axes = 0) {
+void tensor::slice(int split_size, int axes) {
     int shape = m_shape[axes];
     int splits = std::ceil(shape / split_size);
     int size = m_size[axes];
     shard_set.resize(splits);
     for (int i = 0; i < splits; ++i) {
-        shard_set[i] = tensor();
+        //shard_set[i] = tensor();
     }
-    return shard_set[0];
+    
 }
 
-tensor& tensor::slice(std::vector<int> split_shape, int axes = 0) {
+void tensor::slice(std::vector<int> split_shape, int axes) {
     int shape = m_shape[axes];
     int stride = m_stride[axes];
     int size = m_size[axes];
@@ -154,3 +160,11 @@ std::vector<tensor> tensor::shard(std::vector<int>& axes) {
     return shard_set;
 }
 
+void tensor::dump(std::string filename) {
+    char* data = offcopy();
+
+}
+
+void tensor::load(std::string filename) {
+
+}

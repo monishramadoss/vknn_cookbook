@@ -52,11 +52,15 @@ public:
     std::shared_ptr<buffer> getBuffer() { return m_buffer; }
     void reset_device_mem() { m_buffer.reset();}
 
-    char* download(uint32_t offset=0) const;
-    void upload(const std::vector<char>& val, uint32_t offset=0);
+    char* offcopy(uint32_t offset = 0) const;
+    char* download(uint32_t offset = 0) const;
+    void upload(const std::vector<char>& val, uint32_t offset = 0);
     
-    tensor& slice(int split_size, int axes = 0);
-    tensor& slice(std::vector<int> split_shape, int axes = 0);
+    void slice(int split_size, int axes = 0);
+    void slice(std::vector<int> split_shape, int axes = 0);
+
+    void dump(std::string filename="");
+    void load(std::string filename = "");
 
     std::vector<tensor> shard(std::vector<int>& axes);
 
@@ -70,13 +74,13 @@ private:
     std::vector<tensor> shard_set;
     std::vector<int> shard_state;
 
-    int m_begin_offset;
-    int m_end_offset;
+    uint64_t m_begin_offset;
+    uint64_t m_end_offset;
 
     size_t m_size_in_bytes;
     Format m_format;
     std::shared_ptr<buffer> m_buffer;
-    int m_device_id;
+    uint64_t m_device_id;
 
     void upload(std::unique_ptr<char>& ptr);
 
@@ -122,8 +126,3 @@ private:
     std::vector<int> view;
     int counter;    
 };
-
-#include <winsock2.h>
-#include <sys/types.h>
-#include <netcx\shared\1.0\net\checksum.h>
-#include <nettypes.h>
